@@ -18,14 +18,14 @@ and UVM based projects using **XILINX VIVADO** xvlog, xelab and xsim tools.
 ## Contents
 
 1. `dvm.pl` - DVM main script
-2. `dvm.bat` - batchfile wrapper for **dvm.pl** to use on Windows
-3. `pUtils.pm` - Perl package containing utility subroutines for **DVM.pl**
+2. `dvm.bat` - batchfile wrapper for `dvm.pl` to use on Windows
+3. `pUtils.pm` - Perl package containing utility subroutines for `dvm.pl`
 4. `initDvm.bat` - init script for adding dvm to **PATH** and adding **dvmPath** env variable
 5. `templates` - directory containing file templates for **DVM**
 
 ## Usage
 
-To manage a **DVM** project use the **dvm.pl/bat** script. 
+To manage a **DVM** project use the `dvm` script inside a **DVM** project directory.
 
 For exact usage documentation of the script use `dvm -help`
 
