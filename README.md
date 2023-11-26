@@ -8,7 +8,7 @@ and UVM based projects using **XILINX VIVADO** xvlog, xelab and xsim tools.
 1. [Vivado Design Suite](https://www.xilinx.com/support/download.html)
 2. [Perl](https://www.perl.org/get.html)
 
-## Installation
+## Installation
 
 1. Download the latest release of **DVM** or clone the repository
 2. Manually add dvm directory to your PATH and create an environment variable **dvmPath** pointing to your dvm directory or run **initdvm.bat** script
