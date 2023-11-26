@@ -13,15 +13,15 @@ and UVM based projects using **XILINX VIVADO** xvlog, xelab and xsim tools.
 ## Installation
 
 1. Download the latest release of **DVM** or clone the repository
-2. Manually add dvm directory to your **PATH** and create an environment variable **dvmPath** pointing to your dvm directory **or** run **initDvm.bat** script
+2. Manually add dvm directory to your **PATH** and create an environment variable **dvmPath** pointing to your dvm directory **or** run `initDvm.bat` script
 
 ## Contents
 
-1. **dvm.pl** - DVM main script
-2. **dvm.bat** - batchfile wrapper for **dvm.pl** to use on Windows
-3. **pUtils.pm** - Perl package containing utility subroutines for **DVM.pl**
-4. **initDvm.bat** - init script for adding dvm to **PATH** and adding **dvmPath** env variable
-5. **templates** - directory containing file templates for **DVM**
+1. `dvm.pl` - DVM main script
+2. `dvm.bat` - batchfile wrapper for **dvm.pl** to use on Windows
+3. `pUtils.pm` - Perl package containing utility subroutines for **DVM.pl**
+4. `initDvm.bat` - init script for adding dvm to **PATH** and adding **dvmPath** env variable
+5. `templates` - directory containing file templates for **DVM**
 
 ## Usage
 
