@@ -53,7 +53,7 @@ DVM projects are configured by their *dvmproject.conf* config file located under
 #### project
 
 * **dir** - DVM project directory
-* **dvmDir** - DVM project output and config directory (excluding the path to the DVM project)
+* **dvmDir** - DVM project output and config directory (under the DVM project and excluding the path to the project)
 
 #### compilation
 
@@ -233,3 +233,8 @@ DVM does not instruct xelab and xsim to dump waveforms by default. To dump simul
 DVM `-wave` option dumps all waveforms into a `.wdb` database named after the testbench snapshot.
 
 To subsequently view the waveforms start Vivado GUI using `dvm -gui`
+
+## Upcoming features
+
+* customizable **DVM** project file templates
+* customizable **DVM** project dir structure
