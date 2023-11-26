@@ -237,7 +237,7 @@ exit 0;
 
 =head2
 
-=head2 DVM is a tool to manage, compile, elaborate and simulate systemVerilog
+=head2 DVM is a tool to manage, compile, elaborate and simulate SystemVerilog
 
 =head2 and UVM based projects using XILINX VIVADO xvlog, xelab and xsim tools.
 
