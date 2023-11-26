@@ -48,7 +48,7 @@ New project created.
 
 ### Project configuration
 
-DVM projects are configured by their *dvmproject.conf* config file located under `...path_to_project/dvm` containing a Perl hash with the following data:
+DVM projects are configured by their `dvmproject.conf` config file located under `...path_to_project/dvm` containing a Perl hash with the following data:
 
 #### project
 
