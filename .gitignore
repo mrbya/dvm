@@ -1,0 +1,16 @@
+*.crvsdump
+*.exe
+*.ini
+*.jou
+*.log
+*.pb
+*.rlx
+*.rtti
+*.sdb
+*.sv
+*.svtype
+*.tcl
+*.txt
+*.type
+*.wdb
+*.xdbg

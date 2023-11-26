@@ -1,0 +1,14 @@
+`ifndef {{PRJNAME}}_TB_TOP
+`define {{PRJNAME}}_TB_TOP
+
+`include "uvm_macros.svh"
+
+import uvm_pkg::*;
+
+module {{prjname}}_tb_top;
+
+    //testbench implementation
+
+endmodule: {{prjname}}_tb_top
+
+`endif//{{PRJNAME}}_TB_TOP

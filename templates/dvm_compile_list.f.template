@@ -1,0 +1,10 @@
+-i ../design
+-i ../design/src
+-i ../verif/env
+-i ../verif/env/agents
+-i ../verif/env/top
+-i ../verif/tb/src
+-i ../verif/test
+-i ../verif/test/seq
+-i ../verif/test/src
+../verif/tb/src/{{prjname}}_tb_top.sv

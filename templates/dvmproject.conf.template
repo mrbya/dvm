@@ -1,0 +1,27 @@
+(
+    'project'     => {
+        'dir'       => '{{prjdir}}',
+        'dvmDir'    => 'dvm',
+    },
+
+    'compilation' => {
+        'list'      => '{{prjname}}_compile_list.f',
+        'log'       => 'comp.log',
+        'args'      => '-L uvm',
+    },
+
+    'elaboration' => {
+        'tbTop'     => '{{prjname}}_tb_top',
+        'tbName'    => 'top',
+        'timescale' => '1ns/1ps',
+        'log'       => 'elab.log',
+        'args'      => ' ',
+    },
+
+    'simulation'  => {
+        'log'       => 'sim.log',
+        'verbosity' => 'UVM_LOW',
+        'defTest'   => ' ',
+        'args'      => ' ',
+    },
+)
