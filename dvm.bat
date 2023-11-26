@@ -187,8 +187,7 @@ sub compile {
     my $cmd = "xvlog -sv -f $config{'compilation'}{'list'} -log $config{'compilation'}{'log'} $config{'compilation'}{'args'}";
 
     #run xvlog
-    #system
-print($cmd);
+    system($cmd);
 }
 
 sub elab {
@@ -198,8 +197,7 @@ sub elab {
     my $cmd = "xelab $config{'elaboration'}{'tbTop'} -relax -s $config{'elaboration'}{'tbName'} -timescale $config{'elaboration'}{'timescale'} -log $config{'elaboration'}{'log'} $args";
 
     #runc xelab
-    #system
-print($cmd);
+    system($cmd);
 }
 
 sub runsim {
@@ -213,8 +211,7 @@ sub runsim {
     my $cmd = "xsim $config{'elaboration'}{'tbName'} -log $config{'simulation'}{'log'} -testplusarg \"UVM_VERBOSITY=$config{'simulation'}{'verbosity'}\" -testplusarg \"UVM_TESTNAME=$test\" $args";
 
     #run xsim
-    #system
-print($cmd);
+    system($cmd);
 }
 
 sub gui {
@@ -229,8 +226,7 @@ sub gui {
     my $cmd = "xsim --gui $wfile";
 
     #run xsim gui
-    #system
-print($cmd);
+    system($cmd);
 }
 
 exit 0;
@@ -241,8 +237,7 @@ exit 0;
 
 =head2
 
-=head2 DVM is a tool to manage, compile, elaborate and simulate #system
-printVerilog
+=head2 DVM is a tool to manage, compile, elaborate and simulate systemVerilog
 
 =head2 and UVM based projects using XILINX VIVADO xvlog, xelab and xsim tools.
 
