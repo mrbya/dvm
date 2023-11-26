@@ -1,6 +1,6 @@
 # DVM - Lumberjacks Vivado Manager
 
-**DVM** is a **perl** based tool to manage, compile, elaborate and simulate SystemVerilog
+**DVM** is a **Perl** based tool to manage, compile, elaborate and simulate SystemVerilog
 and UVM based projects using **XILINX VIVADO** xvlog, xelab and xsim tools.
 
 ## Requirements
