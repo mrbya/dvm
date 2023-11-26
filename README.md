@@ -31,7 +31,7 @@ For exact usage documentation of the script use `dvm -help`
 
 ### New project
 
-To create a new project under your current working directory use `dvm -new=[PROJECT NAME]`
+To create a new project under your current working directory use `dvm -new=[PROJECT NAME]` (Whitespaces in **DVM** project name are not allowed).
 
 DVM will create a new directory with *[PROJECT NAME]* with all the required directories and config files.
 
