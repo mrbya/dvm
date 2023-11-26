@@ -224,7 +224,7 @@ INFO: [Common 17-206] Exiting xsim at Sun Nov 26 23:27:22 2023...
 
 ## Full run
 
-Compilation, elaboration and simulation steps can be executed in sequence using the `-all` option.
+Compilation, elaboration and simulation steps can be executed in sequence using the `-all` option.
 
 ## Waveform dump
 
