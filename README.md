@@ -183,17 +183,6 @@ Need to provide a UVM test using the `-test` option if a default UVM test is not
 [mycodes/vivado/alu_uvm_test/dvm]$ dvm -run
 Loading DVM project config...
 DVM project config loaded.
-Use of uninitialized value in concatenation (.) or string at C:\Users\viktor.toth\Desktop\This\mycodes\dvm/dvm.bat line 207.
-The syntax of the command is incorrect.
-
-C:\Users\viktor.toth\Desktop\This\mycodes\vivado2\alu_uvm_test\dvm>dvm -run
-Loading DVM project config...
-DVM project config loaded.
-The syntax of the command is incorrect.
-
-C:\Users\viktor.toth\Desktop\This\mycodes\vivado2\alu_uvm_test\dvm>dvm -run
-Loading DVM project config...
-DVM project config loaded.
 ECHO is off.
 ECHO is off.
 
