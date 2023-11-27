@@ -23,14 +23,23 @@ GetOptions(
     'comp'          => \my $comp,
     'elab'          => \my $elab,
     'run'           => \my $run,
-    'test=s'        => \my $test,
     'all'           => \my $all,
+
+    'test=s'        => \my $test,
     'wave'          => \my $wave,
     'gui'           => \my $gui,
     'dumpfile=s'    => \my $dumpfile,
+    'batch'         => \my $batch,
+    'testlist=s'    => \my $testlist,
+    'complog=s'     => \my $complog,
+    'elablog=s'     => \my $elablog,
+    'simlog=s'      => \my $simlog,
 
     #help
     'help'          => \my $help,
+
+    #debug
+    'debug'         => \my $debug,
 );
 
 #global vars
@@ -38,9 +47,10 @@ our $prjpath;
 our $configname;
 our %config;
 our %fileTemplates;
+our @simtests;
 
 #arg parsing
-if (defined $all) {
+if (defined $all or defined $debug) {
     $comp = 1;
     $elab = 1;
     $run = 1;
@@ -57,6 +67,7 @@ $fileTemplates{'prjConfig'}     = "$dvmpath\\templates\\dvmproject.conf.template
 $fileTemplates{'tbTop'}         = "$dvmpath\\templates\\dvm_tb_top.sv.template";
 $fileTemplates{'compileList'}   = "$dvmpath\\templates\\dvm_compile_list.f.template";
 $fileTemplates{'wfcfg'}         = "$dvmpath\\templates\\wfcfg.tcl.template";
+$fileTemplates{'testlist'}      = "$dvmpath\\templates\\test_list.f.template";
 
 $configname = 'dvmproject.conf';
 $configname = $cconfigname if defined $cconfigname;
@@ -78,6 +89,23 @@ sub main {
     #init prjpath and sim test
     $prjpath = $config{'project'}{'dir'};
     $test = $config{'simulation'}{'defTest'} if not defined $test;
+    
+    loadConfig();
+
+    if (defined $batch) {
+        $batch = 1;
+    } else {
+        $batch = $config{'simulation'}{'batch'};
+    }
+
+    if ($batch == 1) {
+        print "UVM test provided even though running in batch mode - option will be ignored...\n" and undef $test if defined $test;
+        
+        $testlist = $config{'simulation'}{'testlist'} if not defined $testlist;
+        getTestList();
+    } else {
+        print "UVM test list provided without running in batch mode - option will be ignored...\n" and undef $testlist if defined $testlist;
+    }
 
     #navigate to DVM project top
     prjTop();
@@ -105,6 +133,13 @@ sub createNewProject {
 
     mkdir "dvm";
     chdir "dvm";
+    mkdir "logs";
+
+    chdir "logs";
+    mkdir "comp";
+    mkdir "elab";
+    mkdir "sim";
+    chdir "..";
 
     my $confdata = pUtils::readFile($fileTemplates{'prjConfig'});
     $confdata = pUtils::replace("{{prjdir}}", $newprjdir, $confdata);
@@ -117,6 +152,11 @@ sub createNewProject {
 
     my $wfcfg = pUtils::readFile($fileTemplates{'wfcfg'});
     pUtils::genFile("wfcfg.tcl", "$wfcfg");
+
+    print "pre tl gen\n";
+    my $tldata = pUtils::readFile($fileTemplates{'testlist'});
+    pUtils::genFile("$name\_test_list.f", $tldata);
+    print "post tl gen\n";
 
     chdir "..";
     mkdir "design";
@@ -169,10 +209,19 @@ sub prjTop {
     chdir "$prjpath/dvm";
 }#prjTop
 
+sub getTestList {
+    my $tldata = pUtils::readFile($testlist);
+    @simtests = pUtils::getList($tldata);
+}#getTestList
+
 #run compilation
 sub compile {
     #construct xvlog cmd
-    my $cmd = "xvlog -sv -f $config{'compilation'}{'list'} -log $config{'compilation'}{'log'} $config{'compilation'}{'args'}";
+    my $logname = $config{'compilation'}{'log'};
+    $logname = "$config{'project'}{'logDir'}\\$config{'compilation'}{'logDir'}\\$logname";
+    $logname = $complog if defined $complog;
+
+    my $cmd = "xvlog -sv -f $config{'compilation'}{'list'} -log $logname $config{'compilation'}{'args'}";
 
     #run xvlog
     system($cmd);
@@ -183,13 +232,19 @@ sub elab {
     #construct xelab cmd
     my $args = "$config{'elaboration'}{'args'}";
     $args = "$args -debug wave" if defined $wave;
-    my $cmd = "xelab $config{'elaboration'}{'tbTop'} -relax -s $config{'elaboration'}{'tbName'} -timescale $config{'elaboration'}{'timescale'} -log $config{'elaboration'}{'log'} $args";
+
+    my $logname = $config{'elaboration'}{'log'};
+    $logname = "$config{'project'}{'logDir'}\\$config{'elaboration'}{'logDir'}\\$logname";
+    $logname = $elablog if defined $elablog;
+
+    my $cmd = "xelab $config{'elaboration'}{'tbTop'} -relax -s $config{'elaboration'}{'tbName'} -timescale $config{'elaboration'}{'timescale'} -log $logname $args";
 
     #runc xelab
     system($cmd);
 }#elab
 
 #run simulation
+#TODO: log name from test name
 sub runsim {
     #construct xsim cmd
     my $args = "$config{'simulation'}{'args'}";
@@ -198,10 +253,30 @@ sub runsim {
     } else {
         $args = "--tclbatch wfcfg.tcl $args";
     }
-    my $cmd = "xsim $config{'elaboration'}{'tbName'} -log $config{'simulation'}{'log'} -testplusarg \"UVM_VERBOSITY=$config{'simulation'}{'verbosity'}\" -testplusarg \"UVM_TESTNAME=$test\" $args";
 
-    #run xsim
-    system($cmd);
+    my @simtestlist;
+
+    if ($batch == 0) {
+        push(@simtestlist, $test);
+    } else {
+        push(@simtestlist, @simtests);
+    }
+    
+    foreach (@simtestlist) {
+        my $logname = $config{'simulation'}{'log'};
+        $logname = pUtils::replace("{{testname}}", $_, $logname);
+
+        $logname = "$config{'project'}{'logDir'}\\$config{'simulation'}{'logDir'}\\$logname";
+
+        if ($batch == 0 and defined $simlog) {
+            $logname = $simlog;
+        }
+
+        my $cmd = "xsim $config{'elaboration'}{'tbName'} -log $logname -testplusarg \"UVM_VERBOSITY=$config{'simulation'}{'verbosity'}\" -testplusarg \"UVM_TESTNAME=$_\" $args";
+
+        #run xsim
+        system($cmd);
+    }
 }#runsim
 
 #open waveform dump in gui
@@ -242,19 +317,19 @@ exit 0;
 
 =head2
 
-=head2  -help, -h                        displays this help
+=head2 -help, -h                        displays this help
 
 =head2
 
-=head2  -new=[PROJECT NAME]     *        creates a new DVM project with [PROJECT NAME] in the current working directory
+=head2 -new=[PROJECT NAME]     *        creates a new DVM project with [PROJECT NAME] in the current working directory
 
-=head2  -comp                   *        compile project
+=head2 -comp                   *        compile project
 
-=head2  -elab                   *        elaborate project
+=head2 -elab                   *        elaborate project
 
-=head2  -run                    *        run project simulation
+=head2 -run                    *        run project simulation
 
-=head2  -all                    *        compiles and elaborates project then runs test simulation
+=head2 -all                    *        compiles and elaborates project then runs test simulation
 
 =head2 
 
@@ -268,13 +343,23 @@ exit 0;
 
 =head2 -configfile=[DVM CONFIG FILE]    specifies DVM config file (need to be specified if default uvm test not configured)
 
-=head2
+=head2 -batch                           run a batch of UVM tests from a test list
+
+=head2 -testlist=[TEST LIST FILE]       specifies test list file for batch test run (default configured in config file)
+
+=head2 -complog=[COMP LOG NAME]         specifies compilation log filename (default comp.log)
+
+=head2 -elablog=[ELAB LOG NAME]         specifies elaboration log name (default elab.log)
+
+=head2 -simlog=[SIM LOG NAME]           specifies simulation run log name (default sim_[TEST NAME].log)
+
+=head2 
 
 =head1 EXAMPLE:
 
 =head2
 
-=head2 dvm -all -test=best_rtl_project_fulltest -wave
+=head2 dvm -all -batch -testlist=./best_rtl_tests.f -wave
 
 =head2
 
@@ -285,6 +370,8 @@ exit 0;
 =head2 1. uvm test does not need to be provided if a default test to be run is configured in the DVM cofig file
 
 =head2 2. '-L uvm' args for compilation and elaboration are configured by default in the DVM config file
+
+=head2 3. for DVM project documentation refer to https://github.com/vtoth2/dvm
 
 =cut
 

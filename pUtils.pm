@@ -68,4 +68,25 @@ sub findFile {
     return @path;
 }
 
+# split string into a list line by line (ignoring comments and whitespace lines)
+# args:
+# $_[1] - string to be converted into a list
+# 
+# returns:
+# @list - list created from the input string
+sub getList {
+    my ($data) = @_;
+    my @list;
+
+    while ($data =~ /([^\n]+)\n?/g) {        
+        if ($1 !~ /^\s*$/) {
+            if ((index($1, "//") == -1) and (index($1, "#") == -1)) {
+                push (@list, $1);
+            }
+        }
+    }
+
+    return @list;
+}
+
 1;

@@ -54,10 +54,12 @@ DVM projects are configured by their `dvmproject.conf` config file located under
 
 * **dir** - DVM project directory path
 * **dvmDir** - DVM project output and config directory (under the DVM project and excluding the path to the project)
+* **logDir** - output logs directory (under DVM project config dir)
 
 #### compilation
 
 * **list** - compile list for xvlog (compile list has to be located under the dvm config directory *dvmDir*)
+* **logDir** - xvlog compilation logs output dir (under project logDir; can be owerwritten using `-complog` option)
 * **log** - xvlog compilation log name (include path if you want to generate log outside DVM project dir)
 * **args** - list of additional arguments used during xvlog compilation (`-L uvm` arg configured by default)
 
@@ -66,14 +68,18 @@ DVM projects are configured by their `dvmproject.conf` config file located under
 * **tbTop** - top module of the testbench (excluding file extension - default: [PROJECT NAME]_tb_top)
 * **tbName** - name of the testbench snapshot created during elaboration
 * **timescale** - timescale used for elaboration and simulation (default: 1ns/1ps)
+* **logDir** - xelab elaboration log directory (under project logDir; can be owerwritten using `-elablog` option)
 * **log** - xelab elaboration log name (include path if you want to generate log outside DVM project dir)
 * **args** - list of additional arguments used during xvlog compilation (`-debug wave` included when using `-wave` option)
 
 #### simulation
 
-* **log** - xsim simulation log name (include path if you want to generate log outside DVM project dir)
+* **logDir** - xsim simulation log directory (under project logDir; can be owerwritten using `-simlog` option)
+* **log** - xsim simulation log name (include path if you want to generate log outside DVM project dir; use `{{testname}}` string in log name to generate based on simulation test name)
 * **verbosity** - UVM message verbosity (default: UVM_LOW)
 * **defTest** - default UVM test used by `dvm -run` (if not configured need to specify using the `-test` option)
+* **batch** - switch to run batch of UVM tests specified by a test list
+* **testlist** - file specifying a list of UVM tests to run (default configured by config file)
 * **args** - list of additional arguments used during xsim simulation (`--tclbatch wfcfg.tcl` included when using `-wave` option)
 
 ### Config example
@@ -81,12 +87,14 @@ DVM projects are configured by their `dvmproject.conf` config file located under
 ```
 (
     'project'     => {
-        'dir'       => 'C:/Users/viktor.toth/Desktop/This/mycodes/dvm/best_rtl_project',
+        'dir'       => 'C:/Users/viktor.toth/Desktop/This/mycodes/vivado/best_rtl_project',
         'dvmDir'    => 'dvm',
+		'logDir'	=> 'logs',
     },
 
     'compilation' => {
         'list'      => 'best_rtl_project_compile_list.f',
+        'logDir'    => 'comp',
         'log'       => 'comp.log',
         'args'      => '-L uvm',
     },
@@ -95,14 +103,18 @@ DVM projects are configured by their `dvmproject.conf` config file located under
         'tbTop'     => 'best_rtl_project_tb_top',
         'tbName'    => 'top',
         'timescale' => '1ns/1ps',
+        'logDir'    => 'elab',
         'log'       => 'elab.log',
         'args'      => ' ',
     },
 
     'simulation'  => {
-        'log'       => 'sim.log',
+        'logDir'    => 'sim',
+        'log'       => 'sim_{{testname}}.log',
         'verbosity' => 'UVM_LOW',
         'defTest'   => 'best_rtl_project_full_test',
+        'batch'     =>  1,
+        'testlist'  => 'best_rtl_project_test_list.f',
         'args'      => ' ',
     },
 )
@@ -222,6 +234,12 @@ DVM does not instruct xelab and xsim to dump waveforms by default. To dump simul
 DVM `-wave` option dumps all waveforms into a `.wdb` database named after the testbench snapshot.
 
 To subsequently view the waveforms start Vivado GUI using `dvm -gui`
+
+## Batch mode
+
+**DVM** allows for a batch of UVM tests to be run using the `-batch` option or configuring the simulation `batch` switch in the config file.
+
+In batch mode **DVM** runs a batch of UVM tests specified by a test list file configured in the config file or provided by the `-testlist` option.
 
 ## Upcoming features
 
