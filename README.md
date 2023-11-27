@@ -52,7 +52,7 @@ DVM projects are configured by their `dvmproject.conf` config file located under
 
 #### project
 
-* **dir** - DVM project directory
+* **dir** - DVM project directory path
 * **dvmDir** - DVM project output and config directory (under the DVM project and excluding the path to the project)
 
 #### compilation
