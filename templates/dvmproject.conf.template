@@ -6,6 +6,7 @@
 
     'compilation' => {
         'list'      => '{{prjname}}_compile_list.f',
+        'logDir'    => 'comp',
         'log'       => 'comp.log',
         'args'      => '-L uvm',
     },
@@ -14,14 +15,18 @@
         'tbTop'     => '{{prjname}}_tb_top',
         'tbName'    => 'top',
         'timescale' => '1ns/1ps',
+        'logDir'    => 'elab',
         'log'       => 'elab.log',
         'args'      => ' ',
     },
 
     'simulation'  => {
-        'log'       => 'sim.log',
+        'logDir'    => 'sim',
+        'log'       => 'sim_{{testname}}.log',
         'verbosity' => 'UVM_LOW',
         'defTest'   => ' ',
         'args'      => ' ',
+        'batch'     =>  0,
+        'testlist'  => '{{prjname}}_test_list.f',
     },
 )
