@@ -88,7 +88,6 @@ sub main {
 
     #init prjpath and sim test
     $prjpath = $config{'project'}{'dir'};
-    $test = $config{'simulation'}{'defTest'} if not defined $test;
     
     loadConfig();
 
@@ -105,6 +104,7 @@ sub main {
         getTestList();
     } else {
         print "UVM test list provided without running in batch mode - option will be ignored...\n" and undef $testlist if defined $testlist;
+        $test = $config{'simulation'}{'defTest'} if not defined $test;
     }
 
     #navigate to DVM project top
@@ -244,7 +244,6 @@ sub elab {
 }#elab
 
 #run simulation
-#TODO: log name from test name
 sub runsim {
     #construct xsim cmd
     my $args = "$config{'simulation'}{'args'}";
@@ -331,27 +330,27 @@ exit 0;
 
 =head2 -all                    *        compiles and elaborates project then runs test simulation
 
+=head2 -gui                    *        runs Vivado GUI and loads default waveform db specified in config file
+
 =head2 
 
 =head2 -wave                            dump waveform
 
-=head2 -gui                             runs Vivado GUI and loads default waveform db
-
-=head2 -dumpfile=[WF DUMP FILE]         specifies waveform dump file for -gui
+=head2 -dumpfile=[WF DUMP FILE]         specifies waveform dump file for -gui (ignores config)
 
 =head2 -test=[TEST NAME]                specifies uvm test to be run with dvm -run
 
 =head2 -configfile=[DVM CONFIG FILE]    specifies DVM config file (need to be specified if default uvm test not configured)
 
-=head2 -batch                           run a batch of UVM tests from a test list
+=head2 -batch                           run a batch of UVM tests from a test list (ignores config)
 
-=head2 -testlist=[TEST LIST FILE]       specifies test list file for batch test run (default configured in config file)
+=head2 -testlist=[TEST LIST FILE]       specifies test list file for batch test run (ignores config)
 
-=head2 -complog=[COMP LOG NAME]         specifies compilation log filename (default comp.log)
+=head2 -complog=[COMP LOG NAME]         specifies compilation log filename (ignores config)
 
-=head2 -elablog=[ELAB LOG NAME]         specifies elaboration log name (default elab.log)
+=head2 -elablog=[ELAB LOG NAME]         specifies elaboration log name (ignores config)
 
-=head2 -simlog=[SIM LOG NAME]           specifies simulation run log name (default sim_[TEST NAME].log)
+=head2 -simlog=[SIM LOG NAME]           specifies simulation run log name (ignores config)
 
 =head2 
 
@@ -376,5 +375,4 @@ exit 0;
 =cut
 
 #TODO:
-#detect invalid arg combinations:
-#-dumpfile wo -gui
+#quiet cmd calls
