@@ -210,9 +210,7 @@ sub prjTop {
 }#prjTop
 
 sub getTestList {
-    print "tl name: $testlist\n";
     my $tldata = pUtils::readFile($testlist);
-    print "tldata:\n$tldata\n";
     @simtests = pUtils::getList($tldata);
 }#getTestList
 
@@ -220,8 +218,8 @@ sub getTestList {
 sub compile {
     #construct xvlog cmd
     my $logname = $config{'compilation'}{'log'};
+    $logname = "$config{'project'}{'logDir'}\\$config{'compilation'}{'logDir'}\\$logname";
     $logname = $complog if defined $complog;
-    $logname = "$config{'compilation'}{'logDir'}\\$logname";
 
     my $cmd = "xvlog -sv -f $config{'compilation'}{'list'} -log $logname $config{'compilation'}{'args'}";
 
@@ -236,8 +234,8 @@ sub elab {
     $args = "$args -debug wave" if defined $wave;
 
     my $logname = $config{'elaboration'}{'log'};
+    $logname = "$config{'project'}{'logDir'}\\$config{'elaboration'}{'logDir'}\\$logname";
     $logname = $elablog if defined $elablog;
-    $logname = "$config{'elaboration'}{'logDir'}\\$logname";
 
     my $cmd = "xelab $config{'elaboration'}{'tbTop'} -relax -s $config{'elaboration'}{'tbName'} -timescale $config{'elaboration'}{'timescale'} -log $logname $args";
 
@@ -263,16 +261,16 @@ sub runsim {
     } else {
         push(@simtestlist, @simtests);
     }
-
+    
     foreach (@simtestlist) {
         my $logname = $config{'simulation'}{'log'};
         $logname = pUtils::replace("{{testname}}", $_, $logname);
-        
+
+        $logname = "$config{'project'}{'logDir'}\\$config{'simulation'}{'logDir'}\\$logname";
+
         if ($batch == 0 and defined $simlog) {
             $logname = $simlog;
         }
-
-        $logname = "$config{'simulation'}{'logDir'}\\$logname";
 
         my $cmd = "xsim $config{'elaboration'}{'tbName'} -log $logname -testplusarg \"UVM_VERBOSITY=$config{'simulation'}{'verbosity'}\" -testplusarg \"UVM_TESTNAME=$_\" $args";
 

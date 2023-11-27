@@ -81,7 +81,6 @@ sub getList {
     while ($data =~ /([^\n]+)\n?/g) {        
         if ($1 !~ /^\s*$/) {
             if ((index($1, "//") == -1) and (index($1, "#") == -1)) {
-                print "$1\n\n";
                 push (@list, $1);
             }
         }

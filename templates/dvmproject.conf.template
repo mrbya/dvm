@@ -2,6 +2,7 @@
     'project'     => {
         'dir'       => '{{prjdir}}',
         'dvmDir'    => 'dvm',
+        'logDir'    => 'logs',
     },
 
     'compilation' => {
@@ -25,8 +26,8 @@
         'log'       => 'sim_{{testname}}.log',
         'verbosity' => 'UVM_LOW',
         'defTest'   => ' ',
-        'args'      => ' ',
         'batch'     =>  0,
         'testlist'  => '{{prjname}}_test_list.f',
+        'args'      => ' ',
     },
 )
