@@ -245,3 +245,4 @@ In batch mode **DVM** runs a batch of UVM tests specified by a test list file co
 
 * customizable **DVM** project file templates
 * customizable **DVM** project dir structure
+* configurable constrained UVM test generator
