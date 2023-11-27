@@ -89,7 +89,7 @@ DVM projects are configured by their `dvmproject.conf` config file located under
     'project'     => {
         'dir'       => 'C:/Users/viktor.toth/Desktop/This/mycodes/vivado/best_rtl_project',
         'dvmDir'    => 'dvm',
-		'logDir'	=> 'logs',
+	'logDir'    => 'logs',
     },
 
     'compilation' => {
