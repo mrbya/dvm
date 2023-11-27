@@ -89,7 +89,7 @@ sub main {
     elab() if defined $elab;
     runsim() if defined $run;
     gui() if defined $gui;
-}
+}#main
 
 #create new project
 #TODO: parametrize template file generation
@@ -156,26 +156,29 @@ sub createNewProject {
     print "New project created.\n";
 }#createNewProject
 
+#load config hash
 sub loadConfig {
     my @configpath = pUtils::findFile($configname, ".");
     my $configData = pUtils::readFile($configpath[0]);
 
     %config = eval $configData;
-}
+}#loadConfig
 
 #navigate to DVM project top
 sub prjTop {
     chdir "$prjpath/dvm";
-}
+}#prjTop
 
+#run compilation
 sub compile {
     #construct xvlog cmd
     my $cmd = "xvlog -sv -f $config{'compilation'}{'list'} -log $config{'compilation'}{'log'} $config{'compilation'}{'args'}";
 
     #run xvlog
     system($cmd);
-}
+}#compile
 
+#run elaboration
 sub elab {
     #construct xelab cmd
     my $args = "$config{'elaboration'}{'args'}";
@@ -184,8 +187,9 @@ sub elab {
 
     #runc xelab
     system($cmd);
-}
+}#elab
 
+#run simulation
 sub runsim {
     #construct xsim cmd
     my $args = "$config{'simulation'}{'args'}";
@@ -198,8 +202,9 @@ sub runsim {
 
     #run xsim
     system($cmd);
-}
+}#runsim
 
+#open waveform dump in gui
 sub gui {
     #construct xsim gui command
     my $wfile;
@@ -213,7 +218,7 @@ sub gui {
 
     #run xsim gui
     system($cmd);
-}
+}#gui
 
 exit 0;
 
@@ -237,7 +242,7 @@ exit 0;
 
 =head2
 
-=head2  -help/-h                         displays this help
+=head2  -help, -h                        displays this help
 
 =head2
 
@@ -253,15 +258,15 @@ exit 0;
 
 =head2 
 
-=head2 -wave                            generate waveform database
+=head2 -wave                            dump waveform
 
 =head2 -gui                             runs Vivado GUI and loads default waveform db
 
-=head2 -dumpfile=[WF DUMP FILE]         specifies waveform dump for -gui
+=head2 -dumpfile=[WF DUMP FILE]         specifies waveform dump file for -gui
 
 =head2 -test=[TEST NAME]                specifies uvm test to be run with dvm -run
 
-=head2 -configfile=[DVM CONFIG FILE]    specifies DVM config file if not using the default one
+=head2 -configfile=[DVM CONFIG FILE]    specifies DVM config file (need to be specified if default uvm test not configured)
 
 =head2
 
