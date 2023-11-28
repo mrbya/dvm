@@ -389,6 +389,7 @@ exit 0;
 =cut
 
 #TODO:
-#quiet cmd calls__END__
+#quiet cmd calls
+__END__
 :endofperl
 @set "ErrorLevel=" & @goto _undefined_label_ 2>NUL || @"%COMSPEC%" /d/c @exit %ErrorLevel%
