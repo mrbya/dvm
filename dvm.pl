@@ -24,16 +24,29 @@ GetOptions(
     'elab'          => \my $elab,
     'run'           => \my $run,
     'all'           => \my $all,
-
-    'test=s'        => \my $test,
-    'wave'          => \my $wave,
     'gui'           => \my $gui,
-    'dumpfile=s'    => \my $dumpfile,
+
+    #comp args
+    'complog=s'     => \my $complog,
+    'complist=s'    => \my $complist,
+
+    #elab args
+    'elablog=s'     => \my $elablog,
+    'timescale=s'   => \my $timescale,
+    'tbtop=s'       => \my $tbtop,
+    'tb=s'          => \my $tb,
+
+    #sim args
+    'simlog=s'      => \my $simlog,
+    'test=s'        => \my $test,
     'batch'         => \my $batch,
     'testlist=s'    => \my $testlist,
-    'complog=s'     => \my $complog,
-    'elablog=s'     => \my $elablog,
-    'simlog=s'      => \my $simlog,
+    'uvmverb=s'     => \my $uvmverb,
+    'simtb=s'       => \my $simtb,
+
+    #multi-stage args
+    'wave'          => \my $wave,
+    'dumpfile=s'    => \my $dumpfile,
 
     #help
     'help'          => \my $help,
@@ -59,8 +72,14 @@ pod2usage(-verbose => 2) and exit 0 if defined $help;
 print "No required arguments provided!\n\nFor more info use -help or -h\n" and exit 1 if not defined $prjname and not defined $comp and not defined $elab and not defined $run and not defined $gui;
 print "UVM test provided without running simulation - option will be ignored...\n" and undef $test if defined $test and not defined $run;
 print "Waveform dump option used without running elaboration or simulation - option will be ignored...\n" and undef $wave if defined $wave and not defined $elab and not defined $run;
+print "Compile list provided without running compilation - option will be ignored...\n" and undef $complist if defined $complist and not defined $comp;
 print "Vivado GUI option provided while running compilation, elaboration or simulation - option will be ignored...\n" and undef $gui if defined $gui and (defined $comp or defined $elab or defined $run);
 print "Waveform dump file provided without running Vivado GUI - option will be ignored...\n" and undef $dumpfile if defined $dumpfile and not defined $gui;
+print "Testbench snapshot provided without running elaboration - option will be ignored...\n" and undef $tb if defined $tb and not defined $elab;
+print "Timescale provided without running elaboration - option will be ignored...\n" and undef $timescale if defined $timescale and not defined $elab;
+print "UVM verbosity provided without running simulation - option will be ignored...\n" and undef $uvmverb if defined $uvmverb and not defined $run;
+print "Simulation testbench snapshot provided without running simulation - option will be ignored...\n" and undef $simtb if defined $simtb and not defined $run;
+print "Testbench topmodule provided without running elaboration - option will be ignored...\n" and undef $tbtop if defined $tbtop and not defined $elab;
 
 #script config
 $fileTemplates{'prjConfig'}     = "$dvmpath\\templates\\dvmproject.conf.template";
@@ -76,7 +95,6 @@ $configname = $cconfigname if defined $cconfigname;
 main();
 
 #script body
-#TODO: batch test run
 sub main {
     #DVM project creation
     createNewProject($prjname) and exit 0 if defined $prjname;
@@ -88,8 +106,6 @@ sub main {
 
     #init prjpath and sim test
     $prjpath = $config{'project'}{'dir'};
-    
-    loadConfig();
 
     if (defined $batch) {
         $batch = 1;
@@ -120,7 +136,7 @@ sub main {
 }#main
 
 #create new project
-#TODO: parametrize template file generation
+#TODO: parametrize template file generation and project dir structure
 sub createNewProject {
     my ($name) = @_;
     my $newprjdir = getcwd();
@@ -209,6 +225,7 @@ sub prjTop {
     chdir "$prjpath/dvm";
 }#prjTop
 
+#get list of tests from testlist
 sub getTestList {
     my $tldata = pUtils::readFile($testlist);
     @simtests = pUtils::getList($tldata);
@@ -217,11 +234,15 @@ sub getTestList {
 #run compilation
 sub compile {
     #construct xvlog cmd
+    my $args = $config{'compilation'}{'args'};
+
     my $logname = $config{'compilation'}{'log'};
     $logname = "$config{'project'}{'logDir'}\\$config{'compilation'}{'logDir'}\\$logname";
     $logname = $complog if defined $complog;
 
-    my $cmd = "xvlog -sv -f $config{'compilation'}{'list'} -log $logname $config{'compilation'}{'args'}";
+    $complist = $config{'compilation'}{'list'} if not defined $complist;
+
+    my $cmd = "xvlog -sv -f $complist -log $logname $args";
 
     #run xvlog
     system($cmd);
@@ -237,7 +258,13 @@ sub elab {
     $logname = "$config{'project'}{'logDir'}\\$config{'elaboration'}{'logDir'}\\$logname";
     $logname = $elablog if defined $elablog;
 
-    my $cmd = "xelab $config{'elaboration'}{'tbTop'} -relax -s $config{'elaboration'}{'tbName'} -timescale $config{'elaboration'}{'timescale'} -log $logname $args";
+    $tbtop = $config{'elaboration'}{'tbTop'} if not defined $tbtop;
+
+    $tb = $config{'elaboration'}{'tbName'} if not defined $tb;
+
+    $timescale = $config{'elaboration'}{'timescale'} if not defined $timescale;
+
+    my $cmd = "xelab $tbtop -relax -s $tb -timescale $timescale -log $logname $args";
 
     #runc xelab
     system($cmd);
@@ -271,7 +298,14 @@ sub runsim {
             $logname = $simlog;
         }
 
-        my $cmd = "xsim $config{'elaboration'}{'tbName'} -log $logname -testplusarg \"UVM_VERBOSITY=$config{'simulation'}{'verbosity'}\" -testplusarg \"UVM_TESTNAME=$_\" $args";
+        if (not defined $simtb) {
+            $simtb = $simtb = $config{'elaboration'}{'tbName'};
+            $simtb = $tb if defined $tb;
+        }
+
+        $uvmverb = $config{'simulation'}{'verbosity'} if not defined $uvmverb;
+
+        my $cmd = "xsim $simtb -log $logname -testplusarg \"UVM_VERBOSITY=$uvmverb\" -testplusarg \"UVM_TESTNAME=$_\" $args";
 
         #run xsim
         system($cmd);
@@ -312,45 +346,85 @@ exit 0;
 
 =head2
 
-=head2 At least 1 argument marked with '*' required
-
-=head2
-
 =head2 -help, -h                        displays this help
 
 =head2
 
-=head2 -new=[PROJECT NAME]     *        creates a new DVM project with [PROJECT NAME] in the current working directory
+=head1 required args (at least one of the following):
 
-=head2 -comp                   *        compile project
+=head2
 
-=head2 -elab                   *        elaborate project
+=head2 -new=[PROJECT NAME]              creates a new DVM project with [PROJECT NAME] in the current working directory
 
-=head2 -run                    *        run project simulation
+=head2 -comp                            compile project
 
-=head2 -all                    *        compiles and elaborates project then runs test simulation
+=head2 -elab                            elaborate project
 
-=head2 -gui                    *        runs Vivado GUI and loads default waveform db specified in config file
+=head2 -run                             run project simulation
+
+=head2 -all                             compiles and elaborates project then runs test simulation
+
+=head2 -gui                             runs Vivado GUI and loads default waveform db specified in config file
 
 =head2 
 
-=head2 -wave                            dump waveform
+=head1 compilation args:
 
-=head2 -dumpfile=[WF DUMP FILE]         specifies waveform dump file for -gui (ignores config)
+=head2
 
-=head2 -test=[TEST NAME]                specifies uvm test to be run with dvm -run
+=head2 -complog=[COMP LOG NAME]         specifies compilation log filename (ignores config)
 
-=head2 -configfile=[DVM CONFIG FILE]    specifies DVM config file (need to be specified if default uvm test not configured)
+=head2 -complist=[COMPILE LIST]         specifies compile list for compilation (ignores config)
+
+=head2 
+
+=head1 elaboration args:
+
+=head2
+
+=head2 -elablog=[ELAB LOG NAME]         specifies elaboration log name (ignores config)
+
+=head2 -timescale=[TIMESCALE]           specifies timescale for elaborated testbench snapshot (ignores config)
+
+=head2 -tbtop=[TESTBENCH TOP MODULE]    specifies testbench top module to be elaborated (ignores config)
+
+=head2 -tb=[TESTBENCH SNAPSHOT]         specifies testbench snapshot created by elaboration (ignores config)
+
+=head2
+
+=head1 simulation args:
+
+=head2
+
+=head2 -simlog=[SIM LOG NAME]           specifies simulation run log name (ignores config)
+
+=head2 -test=[TEST NAME]                specifies uvm test to be run with dvm -run (ignores config)
 
 =head2 -batch                           run a batch of UVM tests from a test list (ignores config)
 
 =head2 -testlist=[TEST LIST FILE]       specifies test list file for batch test run (ignores config)
 
-=head2 -complog=[COMP LOG NAME]         specifies compilation log filename (ignores config)
+=head2 -uvmverb=UVM_[VERBOSITY]         specifies UVM verbosity level for simulation log (ignores config)
 
-=head2 -elablog=[ELAB LOG NAME]         specifies elaboration log name (ignores config)
+=head2 -simtb=[TESTBENCH SNAPSHOT]      specifies testbench snapshot used for simulation (ignores config)
 
-=head2 -simlog=[SIM LOG NAME]           specifies simulation run log name (ignores config)
+=head2
+
+=head1 multi-stage args:
+
+=head2
+
+=head2 -wave                            specifies waveform dump for elaboration and simulation
+
+=head2 -dumpfile=[WF DUMP FILE]         specifies waveform dump database for -gui (ignores config)
+
+=head2 
+
+=head1 misc args:
+
+=head2
+
+=head2 -configfile=[DVM CONFIG FILE]    specifies DVM config file (need to be specified if default uvm test not configured)
 
 =head2 
 
@@ -366,11 +440,15 @@ exit 0;
 
 =head2
 
-=head2 1. uvm test does not need to be provided if a default test to be run is configured in the DVM cofig file
+=head2 1. args ignoring config do not have to be provided if they are configured in the DVM config file
 
-=head2 2. '-L uvm' args for compilation and elaboration are configured by default in the DVM config file
+=head2 2. args ignoring config do not overwrite the DVM config file, they are passed to vivado tools @ run time
 
-=head2 3. for DVM project documentation refer to https://github.com/vtoth2/dvm
+=head2 3. in case of running -all and -tb is provided without providing -simtb, simulation will be run on the snapshot provided by -tb
+
+=head2 4. '-L uvm' args for compilation and elaboration are configured by default in the DVM config file
+
+=head2 5. for DVM project documentation refer to https://github.com/vtoth2/dvm
 
 =cut
 
