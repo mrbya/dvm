@@ -13,6 +13,7 @@
 @rem ';
 #!/usr/bin/perl
 #line 16
+#TODO: clean project files
 
 use Env;
 use strict;
@@ -39,6 +40,8 @@ GetOptions(
     'run'           => \my $run,
     'all'           => \my $all,
     'gui'           => \my $gui,
+    'genc'          => \my $genc,
+    'cdash'         => \my $cdash,
 
     #comp args
     'complog=s'     => \my $complog,
@@ -83,7 +86,7 @@ if (defined $all or defined $debug) {
     $run = 1;
 }
 pod2usage(-verbose => 2) and exit 0 if defined $help;
-print "No required arguments provided!\n\nFor more info use -help or -h\n" and exit 1 if not defined $prjname and not defined $comp and not defined $elab and not defined $run and not defined $gui;
+print "No required arguments provided!\n\nFor more info use -help or -h\n" and exit 1 if not defined $prjname and not defined $comp and not defined $elab and not defined $run and not defined $gui and not defined $genc and not defined $cdash;
 print "UVM test provided without running simulation - option will be ignored...\n" and undef $test if defined $test and not defined $run;
 print "Waveform dump option used without running elaboration or simulation - option will be ignored...\n" and undef $wave if defined $wave and not defined $elab and not defined $run;
 print "Compile list provided without running compilation - option will be ignored...\n" and undef $complist if defined $complist and not defined $comp;
@@ -143,10 +146,12 @@ sub main {
     print "DVM project config loaded.\n";
 
     #vivado wrappers
-    compile() if defined $comp;
-    elab() if defined $elab;
-    runsim() if defined $run;
-    gui() if defined $gui;
+    compile()   if defined $comp;
+    elab()      if defined $elab;
+    runsim()    if defined $run;
+    gui()       if defined $gui;
+    genCov()    if defined $genc;
+    covDash()   if defined $cdash;
 }#main
 
 #create new project
@@ -341,6 +346,24 @@ sub gui {
     #run xsim gui
     system($cmd);
 }#gui
+
+#generate html dashboard from coverage db
+sub genCov {
+    my $cmd = "xcrg -report_format html -dir xsim.covdb";
+
+    #run xcrg
+    system($cmd);
+}
+
+#open coverage dashboard
+sub covDash {
+    #navigate to generated coverage dashboard dir
+    prjTop();
+    chdir "xcrg_func_cov_report";
+
+    #open coverage dashboard html
+    system("dashboard.html");
+}
 
 exit 0;
 
