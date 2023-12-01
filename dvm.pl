@@ -174,10 +174,8 @@ sub createNewProject {
     my $wfcfg = pUtils::readFile($fileTemplates{'wfcfg'});
     pUtils::genFile("wfcfg.tcl", "$wfcfg");
 
-    print "pre tl gen\n";
     my $tldata = pUtils::readFile($fileTemplates{'testlist'});
     pUtils::genFile("$name\_test_list.f", $tldata);
-    print "post tl gen\n";
 
     chdir "..";
     mkdir "design";
