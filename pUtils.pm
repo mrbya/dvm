@@ -59,11 +59,14 @@ sub findFile {
     my ($file, $directory) = @_;
     my @path;
 
-    find (sub {
-        if (index($File::Find::name, $file) != -1) {
-            push @path, $File::Find::name;
-        }
-    }, $directory);
+    find (
+        sub {
+            if (index($File::Find::name, $file) != -1) {
+                push @path, $File::Find::name;
+            }
+        },
+        $directory
+    );
     
     return @path;
 }

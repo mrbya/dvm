@@ -13,7 +13,6 @@
 @rem ';
 #!/usr/bin/perl
 #line 16
-#TODO: clean project files
 
 use Env;
 use strict;
@@ -110,10 +109,11 @@ sub main {
                 $sline = substr($sline, index($sline, "c_"), length($sline));
                 my ($cond) = $sline =~ /^(\S+)/;
                 $cond = substr($cond, 2, length($cond));
-                $cond = int($cond);
+                $cond = $isa{'cond'}{$cond};
+                $cond = (($cond & 4) << 6) | ($cond & 3);
 
                 #dd cond imm
-                $res = $res | $isa{'cond'}{$cond};
+                $res = $res | $cond;
             }
 
             $res = sprintf("%x\n", $res);
