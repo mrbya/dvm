@@ -1,0 +1,26 @@
+`timescale {{timescale}}
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: {{date}}
+// Design Name: {{prjname}}
+// Module Name: {{module}}
+// Project Name: DVM {{prjname}}
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+module {{module}}(
+    
+);
+
+endmodule

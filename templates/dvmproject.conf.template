@@ -1,5 +1,6 @@
 (
     'project'     => {
+        'name'      => '{{prjname}}',
         'dir'       => '{{prjdir}}',
         'dvmDir'    => 'dvm',
         'logDir'    => 'logs',

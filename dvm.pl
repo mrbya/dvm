@@ -19,6 +19,8 @@ GetOptions(
     #dvm project
     'new=s'         => \my $prjname,
     'configfile=s'  => \my $cconfigname,
+    'module=s'      => \my $module,
+    'path=s'        => \my $path,
 
     #vivado
     'comp'          => \my $comp,
@@ -64,6 +66,7 @@ our $configname;
 our %config;
 our %fileTemplates;
 our @simtests;
+our $datestring;
 
 #arg parsing
 if (defined $all or defined $debug) {
@@ -72,7 +75,7 @@ if (defined $all or defined $debug) {
     $run = 1;
 }
 pod2usage(-verbose => 2) and exit 0 if defined $help;
-print "No required arguments provided!\n\nFor more info use -help or -h\n" and exit 1 if not defined $prjname and not defined $comp and not defined $elab and not defined $run and not defined $gui and not defined $genc and not defined $cdash;
+print "No required arguments provided!\n\nFor more info use -help or -h\n" and exit 1 if not defined $prjname and not defined $comp and not defined $elab and not defined $run and not defined $gui and not defined $genc and not defined $cdash and not defined $module;
 print "UVM test provided without running simulation - option will be ignored...\n" and undef $test if defined $test and not defined $run;
 print "Waveform dump option used without running elaboration or simulation - option will be ignored...\n" and undef $wave if defined $wave and not defined $elab and not defined $run;
 print "Compile list provided without running compilation - option will be ignored...\n" and undef $complist if defined $complist and not defined $comp;
@@ -83,6 +86,7 @@ print "Timescale provided without running elaboration - option will be ignored..
 print "UVM verbosity provided without running simulation - option will be ignored...\n" and undef $uvmverb if defined $uvmverb and not defined $run;
 print "Simulation testbench snapshot provided without running simulation - option will be ignored...\n" and undef $simtb if defined $simtb and not defined $run;
 print "Testbench topmodule provided without running elaboration - option will be ignored...\n" and undef $tbtop if defined $tbtop and not defined $elab;
+print "Module template path provided without generating module template - option will be ignored...\n" and undef $path if defined $path and not defined $module;
 
 #script config
 $fileTemplates{'prjConfig'}     = "$dvmpath\\templates\\dvmproject.conf.template";
@@ -90,6 +94,9 @@ $fileTemplates{'tbTop'}         = "$dvmpath\\templates\\dvm_tb_top.sv.template";
 $fileTemplates{'compileList'}   = "$dvmpath\\templates\\dvm_compile_list.f.template";
 $fileTemplates{'wfcfg'}         = "$dvmpath\\templates\\wfcfg.tcl.template";
 $fileTemplates{'testlist'}      = "$dvmpath\\templates\\test_list.f.template";
+$fileTemplates{'svmodule'}      = "$dvmpath\\templates\\svmodule.sv.template";
+
+$datestring = localtime();
 
 $configname = 'dvmproject.conf';
 $configname = $cconfigname if defined $cconfigname;
@@ -131,6 +138,9 @@ sub main {
 
     print "DVM project config loaded.\n";
 
+    #sv module template generation
+    createModuleTemplate($module, $path) and exit 0 if defined $module;
+
     #vivado wrappers
     compile()   if defined $comp;
     elab()      if defined $elab;
@@ -163,6 +173,7 @@ sub createNewProject {
     chdir "..";
 
     my $confdata = pUtils::readFile($fileTemplates{'prjConfig'});
+    $confdata = pUtils::replace("{{prjname}}", $name, $confdata);
     $confdata = pUtils::replace("{{prjdir}}", $newprjdir, $confdata);
     $confdata = pUtils::replace("{{prjname}}", $name, $confdata);
     pUtils::genFile("dvmproject.conf", "$confdata");
@@ -214,6 +225,37 @@ sub createNewProject {
 
     print "New project created.\n";
 }#createNewProject
+
+sub createModuleTemplate {
+    my ($moduleName, $modulePath) = @_;
+    my $moduleData = pUtils::readFile($fileTemplates{'svmodule'});
+    my $delimiter;
+    my @dirList;
+
+    $moduleData = pUtils::replace("{{timescale}}", $config{'elaboration'}{'timescale'}, $moduleData);
+    $moduleData = pUtils::replace("{{date}}", $datestring, $moduleData);
+    $moduleData = pUtils::replace("{{prjname}}", $config{'project'}{'name'}, $moduleData);
+    $moduleData = pUtils::replace("{{module}}", $moduleName, $moduleData);
+    $moduleData = pUtils::replace("{{module}}", $moduleName, $moduleData);
+
+    chdir "../design/src";
+
+    if (defined $modulePath) {
+        $modulePath = pUtils::replace("/", "\"", $modulePath);
+
+        @dirList = split(/"/, $modulePath);
+
+        foreach (@dirList) {
+            if (not -d $_) {
+                mkdir $_;
+            }
+
+            chdir $_;
+        }
+    }
+
+    pUtils::genFile("$moduleName.sv", $moduleData);
+}
 
 #load config hash
 sub loadConfig {
@@ -377,6 +419,8 @@ exit 0;
 
 =head2 -new=[PROJECT NAME]              creates a new DVM project with [PROJECT NAME] in the current working directory
 
+=head2 -module=[MODULE NAME]            generates a SystemVerilog module template under {DVMprojectTop}/design/src
+
 =head2 -comp                            compile project
 
 =head2 -elab                            elaborate project
@@ -446,6 +490,8 @@ exit 0;
 =head2
 
 =head2 -configfile=[DVM CONFIG FILE]    specifies DVM config file (need to be specified if default uvm test not configured)
+
+=head2 -path=[RELATIVE PATH]            specifies sv module template path relative to {DVMprojectTop}/design/src
 
 =head2 
 
