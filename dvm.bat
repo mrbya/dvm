@@ -40,6 +40,7 @@ GetOptions(
     'comp'          => \my $comp,
     'elab'          => \my $elab,
     'run'           => \my $run,
+    'runsv'         => \my $runsv,
     'all'           => \my $all,
     'gui'           => \my $gui,
     'genc'          => \my $genc,
@@ -89,7 +90,7 @@ if (defined $all or defined $debug) {
     $run = 1;
 }
 pod2usage(-verbose => 2) and exit 0 if defined $help;
-print "No required arguments provided!\n\nFor more info use -help or -h\n" and exit 1 if not defined $prjname and not defined $comp and not defined $elab and not defined $run and not defined $gui and not defined $genc and not defined $cdash and not defined $module;
+print "No required arguments provided!\n\nFor more info use -help or -h\n" and exit 1 if not defined $prjname and not defined $comp and not defined $elab and not defined $run and not defined $gui and not defined $genc and not defined $cdash and not defined $module and not defined $runsv;
 print "UVM test provided without running simulation - option will be ignored...\n" and undef $test if defined $test and not defined $run;
 print "Waveform dump option used without running elaboration or simulation - option will be ignored...\n" and undef $wave if defined $wave and not defined $elab and not defined $run;
 print "Compile list provided without running compilation - option will be ignored...\n" and undef $complist if defined $complist and not defined $comp;
@@ -159,6 +160,7 @@ sub main {
     compile()   if defined $comp;
     elab()      if defined $elab;
     runsim()    if defined $run;
+    runsvsim()  if defined $runsv;
     gui()       if defined $gui;
     genCov()    if defined $genc;
     covDash()   if defined $cdash;
@@ -370,6 +372,46 @@ sub runsim {
         system($cmd);
     }
 }#runsim
+
+#run pure systemverilog sim
+sub runsvsim {
+    #construct xsim cmd
+    my $args = "$config{'simulation'}{'args'}";
+    if (not defined $wave) {
+        $args = "-R $args";
+    } else {
+        $args = "--tclbatch wfcfg.tcl $args";
+    }
+
+    my @simtestlist;
+
+    if ($batch == 0) {
+        push(@simtestlist, $test);
+    } else {
+        push(@simtestlist, @simtests);
+    }
+    
+    my $logname = $config{'simulation'}{'log'};
+    $logname = pUtils::replace("{{testname}}", "svsim", $logname);
+
+    $logname = "$config{'project'}{'logDir'}\\$config{'simulation'}{'logDir'}\\$logname";
+
+    if ($batch == 0 and defined $simlog) {
+        $logname = $simlog;
+    }
+
+    if (not defined $simtb) {
+        $simtb = $simtb = $config{'elaboration'}{'tbName'};
+        $simtb = $tb if defined $tb;
+    }
+
+    $uvmverb = $config{'simulation'}{'verbosity'} if not defined $uvmverb;
+
+    my $cmd = "xsim $simtb -log $logname $args";
+
+    #run xsim
+    system($cmd);
+}
 
 #open waveform dump in gui
 sub gui {
