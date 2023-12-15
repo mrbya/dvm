@@ -78,7 +78,7 @@ if (defined $all or defined $debug) {
 pod2usage(-verbose => 2) and exit 0 if defined $help;
 print "No required arguments provided!\n\nFor more info use -help or -h\n" and exit 1 if not defined $prjname and not defined $comp and not defined $elab and not defined $run and not defined $gui and not defined $genc and not defined $cdash and not defined $module and not defined $runsv;
 print "UVM test provided without running simulation - option will be ignored...\n" and undef $test if defined $test and not defined $run;
-print "Waveform dump option used without running elaboration or simulation - option will be ignored...\n" and undef $wave if defined $wave and not defined $elab and not defined $run;
+print "Waveform dump option used without running elaboration or simulation - option will be ignored...\n" and undef $wave if defined $wave and not defined $elab and not defined $run and not defined $runsv;
 print "Compile list provided without running compilation - option will be ignored...\n" and undef $complist if defined $complist and not defined $comp;
 print "Vivado GUI option provided while running compilation, elaboration or simulation - option will be ignored...\n" and undef $gui if defined $gui and (defined $comp or defined $elab or defined $run);
 print "Waveform dump file provided without running Vivado GUI - option will be ignored...\n" and undef $dumpfile if defined $dumpfile and not defined $gui;
