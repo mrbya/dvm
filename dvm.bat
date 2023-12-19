@@ -40,6 +40,7 @@ GetOptions(
     'comp'          => \my $comp,
     'elab'          => \my $elab,
     'run'           => \my $run,
+    'dpi'           => \my $dpi,
     'runsv'         => \my $runsv,
     'all'           => \my $all,
     'gui'           => \my $gui,
@@ -49,6 +50,9 @@ GetOptions(
     #comp args
     'complog=s'     => \my $complog,
     'complist=s'    => \my $complist,
+
+    #dpi args
+    'dpilist=s'     => \my $dpilist,
 
     #elab args
     'elablog=s'     => \my $elablog,
@@ -90,7 +94,7 @@ if (defined $all or defined $debug) {
     $run = 1;
 }
 pod2usage(-verbose => 2) and exit 0 if defined $help;
-print "No required arguments provided!\n\nFor more info use -help or -h\n" and exit 1 if not defined $prjname and not defined $comp and not defined $elab and not defined $run and not defined $gui and not defined $genc and not defined $cdash and not defined $module and not defined $runsv;
+print "No required arguments provided!\n\nFor more info use -help or -h\n" and exit 1 if not defined $prjname and not defined $comp and not defined $elab and not defined $run and not defined $gui and not defined $genc and not defined $cdash and not defined $module and not defined $dpi and not defined $runsv;
 print "UVM test provided without running simulation - option will be ignored...\n" and undef $test if defined $test and not defined $run;
 print "Waveform dump option used without running elaboration or simulation - option will be ignored...\n" and undef $wave if defined $wave and not defined $elab and not defined $run and not defined $runsv;
 print "Compile list provided without running compilation - option will be ignored...\n" and undef $complist if defined $complist and not defined $comp;
@@ -161,6 +165,7 @@ sub main {
     elab()      if defined $elab;
     runsim()    if defined $run;
     runsvsim()  if defined $runsv;
+    dpi_c()     if defined $dpi;
     gui()       if defined $gui;
     genCov()    if defined $genc;
     covDash()   if defined $cdash;
@@ -186,6 +191,7 @@ sub createNewProject {
     mkdir "comp";
     mkdir "elab";
     mkdir "sim";
+    mkdir "dpi";
     chdir "..";
 
     my $confdata = pUtils::readFile($fileTemplates{'prjConfig'});
@@ -325,6 +331,10 @@ sub elab {
 
     $timescale = $config{'elaboration'}{'timescale'} if not defined $timescale;
 
+    if ($config{'elaboration'}{'dpilib'}) {
+        $args = "-sv_lib dpi $args";
+    }
+
     my $cmd = "xelab $tbtop -relax -s $tb -timescale $timescale -log $logname $args";
 
     #runc xelab
@@ -413,6 +423,20 @@ sub runsvsim {
     system($cmd);
 }
 
+#run xsc compiler for dpi-c code
+sub dpi_c {
+    my $args = "$config{'dpi'}{'args'}";
+
+    my $dpilist = "$config{'dpi'}{'list'}" if not defined $dpilist;
+    $dpilist = pUtils::readFile($dpilist);
+    my @srclist = pUtils::getList($dpilist);
+
+    my $cmd = "xsc @srclist $args";
+
+    #run xsc compiler
+    system($cmd);
+}
+
 #open waveform dump in gui
 sub gui {
     #construct xsim gui command
@@ -485,6 +509,10 @@ exit 0;
 
 =head2 -all                             compiles and elaborates project then runs test simulation
 
+=head2 -runsv                           runs pure SystemVerilog simulation (ingores UVM arguments and config)
+
+=head2 -dpi                             compiles C code to link into a snapshot during elaboration using DPI-C
+
 =head2 -gui                             runs Vivado GUI and loads default waveform db specified in config file
 
 =head2 
@@ -528,6 +556,14 @@ exit 0;
 =head2 -uvmverb=UVM_[VERBOSITY]         specifies UVM verbosity level for simulation log (ignores config)
 
 =head2 -simtb=[TESTBENCH SNAPSHOT]      specifies testbench snapshot used for simulation (ignores config)
+
+=head2
+
+=head2 dpi compilation args:
+
+=head2
+
+=head2 -dpilist=[DPI COMPILE LIST]      specifies compile list for dpi C code compilation (ignores config)
 
 =head2
 

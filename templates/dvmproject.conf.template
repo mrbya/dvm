@@ -13,12 +13,18 @@
         'args'      => '-L uvm',
     },
 
+    'dpi' => {
+        'list'      => ' ',
+        'args'      => ' ',
+    },
+
     'elaboration' => {
         'tbTop'     => '{{prjname}}_tb_top',
         'tbName'    => 'top',
         'timescale' => '1ns/1ps',
         'logDir'    => 'elab',
         'log'       => 'elab.log',
+        'dpilib'    =>  0,
         'args'      => ' ',
     },
 
