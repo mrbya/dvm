@@ -234,6 +234,7 @@ sub createNewProject {
     print "New project created.\n";
 }#createNewProject
 
+#generate sv module template
 sub createModuleTemplate {
     my ($moduleName, $modulePath) = @_;
     my $moduleData = pUtils::readFile($fileTemplates{'svmodule'});
@@ -500,6 +501,10 @@ exit 0;
 =head2 -dpi                             compiles C code to link into a snapshot during elaboration using DPI-C
 
 =head2 -gui                             runs Vivado GUI and loads default waveform db specified in config file
+
+=head2 -genc                            generates test coverage report
+
+=head2 -cdash                           opens xilinx coverage dashboard with latest the generated coverage report
 
 =head2 
 

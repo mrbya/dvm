@@ -5,7 +5,7 @@ use File::Find;
 # replace string (case sensitive)
 # args:
 # $_[1] - string to be replaced
-# $_[2] - string the sub replaces
+# $_[2] - string to be replaced by
 # $_[3] - input string
 #
 # returns:
