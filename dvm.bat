@@ -497,7 +497,7 @@ exit 0;
 
 =head2
 
-=head2 -new=[PROJECT NAME]              creates a new DVM project with [PROJECT NAME] in the current working directory
+=head2 -new=[PROJECT NAME]              creates a new DVM project with [PROJECT NAME] nam under the current working directory
 
 =head2 -module=[MODULE NAME]            generates a SystemVerilog module template under {DVMprojectTop}/design/src
 
@@ -559,7 +559,7 @@ exit 0;
 
 =head2
 
-=head2 dpi compilation args:
+=head1 dpi compilation args:
 
 =head2
 
@@ -573,7 +573,7 @@ exit 0;
 
 =head2 -wave                            specifies waveform dump for elaboration and simulation
 
-=head2 -dumpfile=[WF DUMP FILE]         specifies waveform dump database for -gui (ignores config)
+=head2 -dumpfile=[WF DUMP FILE]         specifies waveform dump database (ignores config)
 
 =head2 
 
@@ -581,7 +581,7 @@ exit 0;
 
 =head2
 
-=head2 -configfile=[DVM CONFIG FILE]    specifies DVM config file (need to be specified if default uvm test not configured)
+=head2 -configfile=[DVM CONFIG FILE]    specifies DVM project config file
 
 =head2 -path=[RELATIVE PATH]            specifies sv module template path relative to {DVMprojectTop}/design/src
 
