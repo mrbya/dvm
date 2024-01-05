@@ -148,10 +148,10 @@ sub main {
 
     #vivado wrappers
     compile()   if defined $comp;
+    dpi_c()     if defined $dpi;
     elab()      if defined $elab;
     runsim()    if defined $run;
     runsvsim()  if defined $runsv;
-    dpi_c()     if defined $dpi;
     gui()       if defined $gui;
     genCov()    if defined $genc;
     covDash()   if defined $cdash;
