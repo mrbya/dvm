@@ -136,6 +136,9 @@ sub main {
     #init prjpath and sim test
     $prjpath = $config{'project'}{'dir'};
 
+    #navigate to DVM project top
+    prjTop();
+
     if (defined $batch) {
         $batch = 1;
     } else {
@@ -151,9 +154,6 @@ sub main {
         print "UVM test list provided without running in batch mode - option will be ignored...\n" and undef $testlist if defined $testlist;
         $test = $config{'simulation'}{'defTest'} if not defined $test;
     }
-
-    #navigate to DVM project top
-    prjTop();
 
     print "DVM project config loaded.\n";
 
