@@ -17,4 +17,4 @@ and UVM based projects using **XILINX VIVADO** xvlog, xelab and xsim tools.
 
 ## Contents
 
-For documentation refer to projects [Wiki](https://github.com/vtoth2/dvm/wiki)
+For exact documentation refer to [DVM Wiki](https://github.com/vtoth2/dvm/wiki)
