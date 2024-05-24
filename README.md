@@ -7,8 +7,6 @@ and UVM based projects using **XILINX VIVADO** xvlog, xelab and xsim tools.
 
 1. [Vivado Design Suite](https://www.xilinx.com/support/download.html)
 2. [Perl](https://www.perl.org/get.html)
-3. *[Vivado Install dir]/lib/win64.o* and *[Vivado Install dir]/bin* added to your **PATH**
-4. have a **XILINX_PATH** env variable pointing to your Vivado install dir
 
 ## Installation
 
