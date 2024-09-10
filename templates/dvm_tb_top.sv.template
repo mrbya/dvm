@@ -12,3 +12,4 @@ module {{prjname}}_tb_top;
 endmodule: {{prjname}}_tb_top
 
 `endif//{{PRJNAME}}_TB_TOP
+

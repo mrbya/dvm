@@ -8,3 +8,4 @@
 -i ../verif/test/seq
 -i ../verif/test/src
 ../verif/tb/src/{{prjname}}_tb_top.sv
+
